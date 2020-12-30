@@ -1,0 +1,23 @@
+﻿syntax = "proto3";
+
+package GameServer.Packet;
+
+option csharp_namespace = "CommonPackage.Packet.GameServer";
+
+message RequestLogin {
+
+	string id = 1;
+	string passowrd =2; 
+}
+
+message ResponseLoginResult {
+
+	enum LoginResult {
+		SUCCESS = 0;
+		FAIL = 2;
+		TIME_OUT = 3;
+	}
+
+	string token = 1;
+	LoginResult result = 2;
+}

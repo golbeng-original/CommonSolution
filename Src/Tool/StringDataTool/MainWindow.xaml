@@ -1,0 +1,109 @@
+﻿<Window x:Class="GolbengFramework.StringDataTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GolbengFramework.StringDataTool"
+        mc:Ignorable="d"
+        Title="StringDataTool" Height="514" Width="915" Loaded="Window_Loaded">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="30"/>
+			<RowDefinition Height="30"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="100"/>
+		</Grid.RowDefinitions>
+		<Grid Grid.Row="0">
+			<Border BorderBrush="#4C000000" BorderThickness="0,0,0,1">
+				<Grid>
+					<Label Content="Project 경로" HorizontalAlignment="Left" Width="90" VerticalAlignment="Center" Margin="0,2" FontWeight="Bold" HorizontalContentAlignment="Right"/>
+					<TextBox x:Name="_rootPathTextBox" Text="{Binding Path=RootPath, Mode=OneWay}" Margin="95,2,76,2" TextWrapping="Wrap" IsEnabled="False" VerticalContentAlignment="Center"/>
+					<Button Content="설정" HorizontalAlignment="Right" Width="61" VerticalAlignment="Center" Margin="0,0,10,0" Tag="PATH_CONFIG" Click="Button_Click" />
+				</Grid>
+			</Border>
+		</Grid>
+		<Grid Grid.Row="1">
+			<Border BorderBrush="#4C000000" BorderThickness="0,0,0,1">
+				<Grid>
+					<Label Content="분류" HorizontalAlignment="Left" Width="67" VerticalAlignment="Center" Margin="0,2" HorizontalContentAlignment="Right"/>
+					<ComboBox x:Name="_fileComboBox" HorizontalAlignment="Left" Margin="72,2,0,2" Width="151" SelectionChanged="_fileComboBox_SelectionChanged">
+						<ComboBox.ItemTemplate>
+							<DataTemplate>
+								<StackPanel>
+									<StackPanel Orientation="Horizontal">
+										<Ellipse Fill="{Binding Path=State}" Height="8" Width="8" Margin="4,0" VerticalAlignment="Center"/>
+										<TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+									</StackPanel>
+								</StackPanel>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+
+					<Button Content="저장" Margin="0,5,76,5" Tag="SAVE" Click="Button_Click" HorizontalAlignment="Right" Width="60" />
+					<Button Content="Publish" Margin="0,5,10,5" Tag="PUBLISH" Click="Button_Click" HorizontalAlignment="Right" Width="60" />
+
+				</Grid>
+			</Border>
+		</Grid>
+		<Grid Grid.Row="2">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="30"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+			<Grid Grid.Row="0">
+				<Label Content="그룹 분류" HorizontalAlignment="Left" Width="71" VerticalAlignment="Center" Margin="0,0,0,0" HorizontalContentAlignment="Center"/>
+				<ComboBox x:Name="_groupComboBox" HorizontalAlignment="Left" Margin="72,2,0,2" Width="120" SelectionChanged="_groupComboBox_SelectionChanged">
+					<ComboBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel>
+								<TextBlock Text="{Binding Path=GroupName}"/>
+							</StackPanel>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+				<Label Content="Key 필터" HorizontalAlignment="Left" Width="66" VerticalAlignment="Center" Margin="205,2,0,2" HorizontalContentAlignment="Right"/>
+				<TextBox Text="{Binding Path=FilterKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged }" Margin="276,2,0,2" TextWrapping="Wrap" HorizontalAlignment="Left" Width="120" VerticalContentAlignment="Center" TextChanged="TextBox_TextChanged"/>
+				<Label Content="Data 필터" HorizontalAlignment="Left" Width="66" VerticalAlignment="Center" Margin="401,2,0,2" HorizontalContentAlignment="Right"/>
+				<TextBox Text="{Binding Path=FilterData, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="476,2,0,2" TextWrapping="Wrap" HorizontalAlignment="Left" Width="120" VerticalContentAlignment="Center" TextChanged="TextBox_TextChanged"/>
+			</Grid>
+			<Grid Grid.Row="1">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="671*"/>
+					<ColumnDefinition Width="4"/>
+					<ColumnDefinition Width="236*"/>
+				</Grid.ColumnDefinitions>
+				<DataGrid Grid.Column="0" x:Name="_dataGrid" AutoGenerateColumns="False" SelectionMode="Single"
+							RowEditEnding="_dataGrid_RowEditEnding" 
+							InitializingNewItem="_dataGrid_InitializingNewItem" 
+							CellEditEnding="_dataGrid_CellEditEnding" 
+							BeginningEdit="_dataGrid_BeginningEdit" 
+							SelectionChanged="_dataGrid_SelectionChanged" 
+							CommandManager.PreviewCanExecute="_dataGrid_PreviewCanExecute">
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="Key" Binding="{Binding Key, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+						<DataGridTextColumn Header="Data" Binding="{Binding Data, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+						<DataGridTextColumn Header="Group" Binding="{Binding Group, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+					</DataGrid.Columns>
+					<DataGrid.InputBindings>
+						<KeyBinding Key="Delete" Command="Delete"/>
+					</DataGrid.InputBindings>
+				</DataGrid>
+				<GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
+				<DataGrid Grid.Column="2" x:Name="_optionDataGrid" AutoGenerateColumns="False" SelectionMode="Single"
+							InitializingNewItem="_optionDataGrid_InitializingNewItem"
+							CellEditEnding="_optionDataGrid_CellEditEnding"
+							RowEditEnding="_optionDataGrid_RowEditEnding"
+							BeginningEdit="_optionDataGrid_BeginningEdit"
+							CommandManager.PreviewCanExecute="_optionDataGrid_PreviewCanExecute">
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="OptionKey" Binding="{Binding Key, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+						<DataGridTextColumn Header="OptionValue" Binding="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+					</DataGrid.Columns>
+				</DataGrid>
+			</Grid>
+		</Grid>
+		<Grid Grid.Row="3">
+			<ListBox x:Name="_logListBox" />
+		</Grid>
+	</Grid>
+</Window>
