@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,9 +14,64 @@ namespace GolbengFramework.GenerateTool.Utils
 		public string msbuildPath;
 	}
 
-	public class ToolConfigUtil
+	public class ToolPathConfigInfo
+	{
+		public string SchemaPath { get; set; } = @"Data\Table\schema";
+		public string TablePath { get; set; } = @"Data\Table";
+		public string CommonPackageProjPath { get; set; } = @"Common\CommonPackage\CommonPackage.csproj";
+		public string SourcePath { get; set; } = @"Common\CommonPackage\src\table\GenerateTables.cs";
+		public string ClientSrcPath { get; set; } = @"Src\Client\CookieGame\Assets\StreamingAssets\Data\Table";
+		public string ClientBinPath { get; set; } = @"Bin\Client\**\StreamingAssets";
+		public string ServerPath { get; set; } = @"Bin\Data\Table";
+		public string CommonDllPath { get; set; } = @"Bin\Lib\CommonPackage.dll";
+		public string EnumPath { get; set; } = @"Data\Table\enums.json";
+
+		public void Serialize(string path)
+		{
+			var jsonConfigContent = Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+			using (StreamWriter streamReader = new StreamWriter(path))
+			{
+				streamReader.Write(jsonConfigContent);
+			}
+		}
+
+		public bool Deserialize(string path)
+		{
+			try
+			{
+				using (StreamReader streamReader = new StreamReader(path))
+				{
+					string jsonConfigContent = streamReader.ReadToEnd();
+
+					var deserialize = Newtonsoft.Json.JsonConvert.DeserializeObject<ToolPathConfigInfo>(jsonConfigContent);
+
+					this.SchemaPath = deserialize.SchemaPath;
+					this.TablePath = deserialize.TablePath;
+					this.CommonPackageProjPath = deserialize.CommonPackageProjPath;
+					this.SourcePath = deserialize.SourcePath;
+					this.ClientSrcPath = deserialize.ClientSrcPath;
+					this.ClientBinPath = deserialize.ClientBinPath;
+					this.ServerPath = deserialize.ServerPath;
+					this.CommonDllPath = deserialize.CommonDllPath;
+					this.EnumPath = deserialize.EnumPath;
+				}
+
+				return true;
+			}
+			catch(Exception e)
+			{
+				Debug.WriteLine(e.Message);
+				return false;
+			}
+
+		}
+	}
+
+
+	public partial class ToolConfigUtil
 	{
 		private static readonly string _staticConfigFileName = "config.json";
+
 
 		public static ToolConfigInfo LoadToolConfig()
 		{
@@ -46,6 +102,83 @@ namespace GolbengFramework.GenerateTool.Utils
 		private static string ConfigFilePath
 		{
 			get => System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _staticConfigFileName);
+		}
+	}
+
+	public partial class ToolConfigUtil
+	{
+		private static readonly string _staticPathConfigFileName = "pathconfig.json";
+
+		public static (ToolPathConfigInfo pathConfig, bool isNew) LoadPathConfig()
+		{
+			string fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _staticPathConfigFileName);
+			bool isNew = false;
+
+			ToolPathConfigInfo toolPathConfigInfo = new ToolPathConfigInfo();
+			if(toolPathConfigInfo.Deserialize(fullPath) == false)
+			{
+				toolPathConfigInfo.Serialize(fullPath);
+				isNew = true;
+			}
+
+			return (toolPathConfigInfo, isNew);
+		}
+	}
+
+	public partial class ToolConfigUtil
+	{
+		public static string FindWildCardPath(string wildCardPath)
+		{
+			string fullPath = "";
+
+			var paths = wildCardPath.Split(@"\".ToArray());
+
+			bool needFindPostFix = false;
+			foreach(var path in paths)
+			{
+				if(path.Equals("**") == true)
+				{
+					needFindPostFix = true;
+					continue;
+				}
+
+				if(needFindPostFix == true)
+				{
+					fullPath = FindDoubleStartPath(fullPath, path);
+					needFindPostFix = false;
+					continue;
+				}
+
+				if (System.IO.Path.IsPathRooted(path) == true)
+				{
+					fullPath = path + System.IO.Path.DirectorySeparatorChar;
+				}
+				else
+				{
+					fullPath = System.IO.Path.Combine(fullPath, path);
+				}
+			}
+
+			return fullPath;
+		}
+
+		private static string FindDoubleStartPath(string prefixPath, string postfixPath)
+		{
+			DirectoryInfo directorInfo = new DirectoryInfo(prefixPath);
+			foreach(var subDir in directorInfo.GetDirectories())
+			{
+				var searchPath = System.IO.Path.Combine(subDir.FullName, postfixPath);
+				if(Directory.Exists(searchPath) == true)
+				{
+					return searchPath;
+				}
+
+				searchPath = FindDoubleStartPath(subDir.FullName, postfixPath);
+				if (string.IsNullOrEmpty(searchPath) == false)
+					return searchPath;
+			}
+
+			return "";
 		}
 	}
 }

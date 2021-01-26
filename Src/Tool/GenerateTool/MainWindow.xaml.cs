@@ -24,16 +24,6 @@ namespace GolbengFramework.GenerateTool
 	/// </summary>
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
-		private static readonly string _staticSchemaReleativePath = @"Data\Table\schema";
-		private static readonly string _staticTableReleativePath = @"Data\Table";
-		private static readonly string _staticCommonPackageProjReleativePath = @"Src\Common\CommonPackage\CommonPackage.csproj";
-		private static readonly string _staticSourceReleativePath = @"Src\Common\CommonPackage\src\table\GenerateTables.cs";
-		private static readonly string _staticClientReleativePath = @"Src\Client\CookieGame\Assets\StreamingAssets\Data\Table";
-		private static readonly string _staticServerReleativePath = @"Bin\Data\Table";
-
-		private static readonly string _staticCommonDllReleativePath = @"Bin\Lib\CommonPackage.dll";
-		private static readonly string _staticEnumReleativePath = @"Data\Table\enums.json";
-
 		public enum FilterType
 		{
 			FileName,
@@ -44,6 +34,8 @@ namespace GolbengFramework.GenerateTool
 
 		private Lazy<EnumsDefines> _enumDefines;
 
+		private ToolPathConfigInfo _toolPathConfigInfo = new ToolPathConfigInfo();
+
 		private string _rootPath = "";
 		private string _msBuildPath = "";
 
@@ -51,21 +43,23 @@ namespace GolbengFramework.GenerateTool
 
 		public string MSBuildPath { get => _msBuildPath; }
 
-		public string SchemaPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _staticSchemaReleativePath) : ""; }
+		public string SchemaPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.SchemaPath) : ""; }
 
-		public string TablePath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _staticTableReleativePath) : ""; }
+		public string TablePath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.TablePath) : ""; }
 
-		public string CommonPackageProjPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _staticCommonPackageProjReleativePath) : ""; }
+		public string CommonPackageProjPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.CommonPackageProjPath) : ""; }
 
-		public string SourcePath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _staticSourceReleativePath) : ""; }
+		public string SourcePath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.SourcePath) : ""; }
 
-		public string DllPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _staticCommonDllReleativePath) : ""; }
+		public string DllPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.CommonDllPath) : ""; }
 
-		public string EnumPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _staticEnumReleativePath) : ""; }
+		public string EnumPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.EnumPath) : ""; }
 
-		public string ClientDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _staticClientReleativePath) : ""; }
+		public string ClientSrcDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientSrcPath) : ""; }
 
-		public string ServerDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _staticServerReleativePath) : ""; }
+		public string ClientBinDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientBinPath) : ""; }
+
+		public string ServerDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ServerPath) : ""; }
 
 		public string FilterText { get => _filterTextBox?.Text; }
 
@@ -85,6 +79,7 @@ namespace GolbengFramework.GenerateTool
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
+			LoadPathConfig();
 			LoadToolConfig();
 
 			_isInitialize = true;
@@ -103,6 +98,16 @@ namespace GolbengFramework.GenerateTool
 					SaveToolConfig();
 				}
 			}
+		}
+
+		private void LoadPathConfig()
+		{
+			var loadResult = ToolConfigUtil.LoadPathConfig();
+
+			_toolPathConfigInfo = loadResult.pathConfig;
+
+			if(loadResult.isNew == true)
+				MessageBox.Show("PathConfig가 새로 생성 되었습니다.");
 		}
 
 		private void SaveToolConfig()
@@ -135,15 +140,15 @@ namespace GolbengFramework.GenerateTool
 
 		public bool CheckRootPath(string rootPath)
 		{
-			string tablePath = System.IO.Path.Combine(rootPath, _staticTableReleativePath);
+			string tablePath = System.IO.Path.Combine(rootPath, _toolPathConfigInfo.TablePath);
 			if (Directory.Exists(tablePath) == false)
 				return false;
 
-			string clientPath = System.IO.Path.Combine(rootPath, _staticClientReleativePath);
+			string clientPath = System.IO.Path.Combine(rootPath, _toolPathConfigInfo.ClientSrcPath);
 			if (Directory.Exists(clientPath) == false)
 				return false;
 
-			string serverPath = System.IO.Path.Combine(rootPath, _staticServerReleativePath);
+			string serverPath = System.IO.Path.Combine(rootPath, _toolPathConfigInfo.ServerPath);
 			if (Directory.Exists(serverPath) == false)
 				return false;
 
@@ -166,7 +171,8 @@ namespace GolbengFramework.GenerateTool
 			OnPropertyChanged("SourcePath");
 			OnPropertyChanged("DllPath");
 			OnPropertyChanged("EnumPath");
-			OnPropertyChanged("ClientDbPath");
+			OnPropertyChanged("ClientSrcDbPath");
+			OnPropertyChanged("ClientBinDbPath");
 			OnPropertyChanged("ServerDbPath");
 			OnPropertyChanged("CommonPackageProjPath");
 
@@ -254,6 +260,14 @@ namespace GolbengFramework.GenerateTool
 			{
 				handler(this, new PropertyChangedEventArgs(name));
 			}
+		}
+
+		private void MenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			InitializeSchmeList();
+			InitializeDataList();
+
+			AddLog("갱신 완료");
 		}
 	}
 }

@@ -55,17 +55,25 @@ namespace GolbengFramework.GenerateTool
 					worker.ReportProgress(currPercent, $"{files[i].Name} schema 내용 검사 중..");
 
 					var schemaDataInfo = new SchemaDataInfo(files[i].FullName);
-					using (var parser = new SchemaTableParser(files[i].FullName))
-					{
-						var schemaData = parser.Parsing();
-						foreach(var field in schemaData.SchemaFields)
-						{
-							if (field.GetNativeType() == typeof(Enum))
-								schemaDataInfo.EnumTypes.Add(field.Type);
-						}	
-					}
 
-					_schemaNameList.Add(schemaDataInfo);
+					try
+					{
+						using (var parser = new SchemaTableParser(files[i].FullName))
+						{
+							var schemaData = parser.Parsing();
+							foreach (var field in schemaData.SchemaFields)
+							{
+								if (field.GetNativeType() == typeof(Enum))
+									schemaDataInfo.EnumTypes.Add(field.Type);
+							}
+						}
+
+						_schemaNameList.Add(schemaDataInfo);
+					}
+					catch(Exception ex)
+					{
+						AddLog($"[{schemaDataInfo.SchemaName}] [{ex.Message}] [inner: {ex.InnerException?.Message}]");
+					}
 
 					currPercent = ProgressDialog.GetPercent(i + 1, files.Length);
 					worker.ReportProgress(currPercent, $"{files[i].Name} schema 내용 검사 완료");
