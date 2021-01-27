@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Protobuf Include="**/*.proto" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Google.Protobuf" Version="3.14.0" />
+		<PackageReference Include="Grpc.Tools" Version="2.34.0-pre1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Properties\" />
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command=":: if $(ConfigurationName) == Release xcopy $(TargetPath) &quot;$(ProjectDir)..\..\..\Src\Client\CookieGame\Assets\Plugins\&quot; /y /e /s&#xD;&#xA;:: if $(ConfigurationName) == Release xcopy $(TargetPath) &quot;$(ProjectDir)..\..\..\Bin\Lib\&quot; /y /e /s&#xD;&#xA;&#xD;&#xA;if $(ConfigurationName) == Release $(ProjectDir)BuildAfterEvent_Copy" />
+	</Target>
+
+</Project>

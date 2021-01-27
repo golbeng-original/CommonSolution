@@ -10,7 +10,7 @@ if not exist %str% (
 
 set targetdir=%str%\Common\
 
-xcopy ".\Src\Common\" %targetdir% /y /e /s
+xcopy ".\Src\Common" %targetdir% /y /e /s
 
 echo %targetdir%에 CommonPackage 생성 완료
 

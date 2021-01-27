@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommonPackage.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,21 +13,21 @@ namespace CommonPackage.Tables
 
 	public class TblBase
 	{
-		public virtual int PrimaryKey { get; set; } = 0;
-		public virtual int SecondaryKey { get; set; } = 0;
+		public virtual uint primarykey { get; set; } = 0;
+		public virtual uint secondarykey { get; set; } = 0;
 
 		public override bool Equals(object obj)
 		{
 			return obj is TblBase @base &&
-				   PrimaryKey == @base.PrimaryKey &&
-				   SecondaryKey == @base.SecondaryKey;
+				   primarykey == @base.primarykey &&
+				   secondarykey == @base.secondarykey;
 		}
 
 		public override int GetHashCode()
 		{
 			int hashCode = -281792184;
-			hashCode = hashCode * -1521134295 + PrimaryKey.GetHashCode();
-			hashCode = hashCode * -1521134295 + SecondaryKey.GetHashCode();
+			hashCode = hashCode * -1521134295 + primarykey.GetHashCode();
+			hashCode = hashCode * -1521134295 + secondarykey.GetHashCode();
 			return hashCode;
 		}
 	}
@@ -35,6 +36,9 @@ namespace CommonPackage.Tables
 	/// Example Table
 	public class TblTable1 : TblBase
 	{
+		public override uint primarykey { get; set; }
+		public override uint secondarykey { get; set; }
+
 		public int Id { get; set; }
 		public string Name { get; set; }
 
@@ -47,13 +51,17 @@ namespace CommonPackage.Tables
 
 	public class TblTable2 : TblBase
 	{
-		public int Id { get; set; }
-		public string Desc { get; set; }
-
+		public override uint primarykey { get; set; } = 0;
+		public override uint secondarykey { get; set; } = 0;
+		public int IntField1 { get; set; } = 0;
+		public string StringField2 { get; set; } = "";
+		public float FloatField3 { get; set; } = 0;
+		public TestEnum EnumField4 { get; set; } = TestEnum.None;
 		public static TableMeta TableMeta { get; set; } = new TableMeta()
 		{
-			TableName = "TblTable2",
-			DbName = "Table2.db"
+			TableName = "TblExample_table",
+			DbName = "Example_table.db"
 		};
 	}
+
 }
