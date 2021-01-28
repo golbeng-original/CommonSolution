@@ -55,11 +55,17 @@ namespace GolbengFramework.GenerateTool
 
 		public string EnumPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.EnumPath) : ""; }
 
-		public string ClientSrcDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientSrcPath) : ""; }
+		public string ClientSrcDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientSrcTablePath) : ""; }
 
-		public string ClientBinDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientBinPath) : ""; }
+		public string ClientBinDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientBinTablePath) : ""; }
+
+		public string ClientSrcConfigPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientSrcConfigPath) : ""; }
+
+		public string ClientBinConfigPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientBinConfigPath) : ""; }
 
 		public string ServerDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ServerPath) : ""; }
+
+		public string ConfigurePath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ConfigurePath) : ""; }
 
 		public string FilterText { get => _filterTextBox?.Text; }
 
@@ -144,7 +150,7 @@ namespace GolbengFramework.GenerateTool
 			if (Directory.Exists(tablePath) == false)
 				return false;
 
-			string clientPath = System.IO.Path.Combine(rootPath, _toolPathConfigInfo.ClientSrcPath);
+			string clientPath = System.IO.Path.Combine(rootPath, _toolPathConfigInfo.ClientSrcTablePath);
 			if (Directory.Exists(clientPath) == false)
 				return false;
 
@@ -175,6 +181,7 @@ namespace GolbengFramework.GenerateTool
 			OnPropertyChanged("ClientBinDbPath");
 			OnPropertyChanged("ServerDbPath");
 			OnPropertyChanged("CommonPackageProjPath");
+			OnPropertyChanged("ConfigurePath");
 
 			InitializeSchmeList();
 			InitializeDataList();
@@ -232,6 +239,8 @@ namespace GolbengFramework.GenerateTool
 				case "SOURCE_GENERATOR": OnSourceGenerator(button); break;
 				case "ENUM_GENERATOR": OnEnumGenerator(button); break;
 				case "BUILD": BuildCommonPackage(button); break;
+				case "SYNC_CONFIGUER": SyncConfigure(button); break;
+				case "SAVE_CONFIGUER": SaveConfigure(button); break;
 			}
 		}
 
@@ -268,6 +277,30 @@ namespace GolbengFramework.GenerateTool
 			InitializeDataList();
 
 			AddLog("갱신 완료");
+		}
+
+		private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (e.AddedItems.Count == 0)
+				return;
+
+			var TabItem = e.AddedItems[0] as TabItem;
+			var tag = TabItem?.Tag as string;
+			if (tag == null)
+				return;
+
+			switch (tag)
+			{
+				case "TABLE":
+					break;
+				case "SOURCE":
+					break;
+				case "ENUM":
+					break;
+				case "CONFIG":
+					InitalizeConfigureFileList();
+					break;
+			}
 		}
 	}
 }

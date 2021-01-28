@@ -199,7 +199,10 @@ namespace GolbengFramework.GenerateTool
 					var clientSrcDbPath = ToolConfigUtil.FindWildCardPath(ClientSrcDbPath);
 					if (Directory.Exists(clientSrcDbPath) == false)
 						throw new Exception($"{ClientSrcDbPath} 경로가 존재 하지 않습니다.");
-					
+
+					if (Directory.Exists(clientSrcDbPath) == false)
+						Directory.CreateDirectory(clientSrcDbPath);
+
 					ExcelTableConverter clientSrcConverter = new ExcelTableConverter(clientSrcDbPath, excelDataTables, _enumDefines.Value);
 					clientSrcConverter.Convter();
 				}
@@ -213,6 +216,9 @@ namespace GolbengFramework.GenerateTool
 					var clientBinDbPath = ToolConfigUtil.FindWildCardPath(ClientBinDbPath);
 					if (Directory.Exists(clientBinDbPath) == false)
 						throw new Exception($"{ClientBinDbPath} 경로가 존재 하지 않습니다.");
+
+					if (Directory.Exists(clientBinDbPath) == false)
+						Directory.CreateDirectory(clientBinDbPath);
 
 					ExcelTableConverter clientSrcConverter = new ExcelTableConverter(clientBinDbPath, excelDataTables, _enumDefines.Value);
 					clientSrcConverter.Convter();

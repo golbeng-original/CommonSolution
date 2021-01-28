@@ -20,11 +20,16 @@ namespace GolbengFramework.GenerateTool.Utils
 		public string TablePath { get; set; } = @"Data\Table";
 		public string CommonPackageProjPath { get; set; } = @"Common\CommonPackage\CommonPackage.csproj";
 		public string SourcePath { get; set; } = @"Common\CommonPackage\src\table\GenerateTables.cs";
-		public string ClientSrcPath { get; set; } = @"Src\Client\CookieGame\Assets\StreamingAssets\Data\Table";
-		public string ClientBinPath { get; set; } = @"Bin\Client\**\StreamingAssets";
+		public string ClientSrcTablePath { get; set; } = @"Src\Client\CookieGame\Assets\StreamingAssets\Data\Table";
+		public string ClientBinTablePath { get; set; } = @"Bin\Client\**\StreamingAssets\Data\Table";
+
+		public string ClientSrcConfigPath { get; set; } = @"Src\Client\CookieGame\Assets\StreamingAssets\Data\Config";
+		public string ClientBinConfigPath { get; set; } = @"Bin\Client\**\StreamingAssets\Data\Config";
+
 		public string ServerPath { get; set; } = @"Bin\Data\Table";
 		public string CommonDllPath { get; set; } = @"Bin\Lib\CommonPackage.dll";
 		public string EnumPath { get; set; } = @"Data\Table\enums.json";
+		public string ConfigurePath { get; set; } = @"Data\Config";
 
 		public void Serialize(string path)
 		{
@@ -49,11 +54,16 @@ namespace GolbengFramework.GenerateTool.Utils
 					this.TablePath = deserialize.TablePath;
 					this.CommonPackageProjPath = deserialize.CommonPackageProjPath;
 					this.SourcePath = deserialize.SourcePath;
-					this.ClientSrcPath = deserialize.ClientSrcPath;
-					this.ClientBinPath = deserialize.ClientBinPath;
+					this.ClientSrcTablePath = deserialize.ClientSrcTablePath;
+					this.ClientBinTablePath = deserialize.ClientBinTablePath;
+
+					this.ClientSrcConfigPath = deserialize.ClientSrcConfigPath;
+					this.ClientBinConfigPath = deserialize.ClientBinConfigPath;
+
 					this.ServerPath = deserialize.ServerPath;
 					this.CommonDllPath = deserialize.CommonDllPath;
 					this.EnumPath = deserialize.EnumPath;
+					this.ConfigurePath = deserialize.ConfigurePath;
 				}
 
 				return true;
@@ -63,7 +73,6 @@ namespace GolbengFramework.GenerateTool.Utils
 				Debug.WriteLine(e.Message);
 				return false;
 			}
-
 		}
 	}
 
