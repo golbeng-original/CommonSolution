@@ -146,17 +146,27 @@ namespace GolbengFramework.GenerateTool
 
 		public bool CheckRootPath(string rootPath)
 		{
-			string tablePath = System.IO.Path.Combine(rootPath, _toolPathConfigInfo.TablePath);
-			if (Directory.Exists(tablePath) == false)
-				return false;
+			var checkPaths = _toolPathConfigInfo.CheckPaths.Select(p => System.IO.Path.Combine(rootPath, p));
+			foreach(var checkPath in checkPaths)
+			{
+				var fullPath = ToolConfigUtil.FindWildCardPath(checkPath);
+				if(string.IsNullOrEmpty(fullPath) == true)
+					return false;
 
-			string clientPath = System.IO.Path.Combine(rootPath, _toolPathConfigInfo.ClientSrcTablePath);
-			if (Directory.Exists(clientPath) == false)
-				return false;
+				if (Directory.Exists(fullPath) == false)
+					return false;
+			}
 
-			string serverPath = System.IO.Path.Combine(rootPath, _toolPathConfigInfo.ServerPath);
-			if (Directory.Exists(serverPath) == false)
-				return false;
+			var initalizePaths = _toolPathConfigInfo.InitalizePaths.Select(p => System.IO.Path.Combine(rootPath, p));
+			foreach (var initalizePath in initalizePaths)
+			{
+				var fullPath = ToolConfigUtil.FindWildCardPath(initalizePath);
+				if (string.IsNullOrEmpty(fullPath) == true)
+					continue;
+
+				if (Directory.Exists(fullPath) == false)
+					Directory.CreateDirectory(fullPath);
+			}
 
 			return true;
 		}

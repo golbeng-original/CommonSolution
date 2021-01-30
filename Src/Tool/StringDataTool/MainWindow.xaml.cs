@@ -55,6 +55,8 @@ namespace GolbengFramework.StringDataTool
 
 		public bool CheckRootPath(string rootPath)
 		{
+			string checkPaths = new 
+
 			string tablePath = System.IO.Path.Combine(rootPath, _staticStringReleativePath);
 			if (Directory.Exists(tablePath) == false)
 				return false;

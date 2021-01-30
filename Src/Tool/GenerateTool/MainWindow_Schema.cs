@@ -83,6 +83,7 @@ namespace GolbengFramework.GenerateTool
 			dialog.ShowDialog();
 
 			_schemaListBox.ItemsSource = _schemaNameList;
+			_schemaListBox.Items.Refresh();
 		}
 
 		private void OnFilterSchemaList()

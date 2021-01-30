@@ -65,6 +65,7 @@ namespace GolbengFramework.GenerateTool
 			}
 
 			_dataListBox.ItemsSource = _tableDataInfoList;
+			_dataListBox.Items.Refresh();
 		}
 
 		private void OnFilterDataList()

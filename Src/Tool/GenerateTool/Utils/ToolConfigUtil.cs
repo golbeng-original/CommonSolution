@@ -16,14 +16,27 @@ namespace GolbengFramework.GenerateTool.Utils
 
 	public class ToolPathConfigInfo
 	{
+		public string[] CheckPaths { get; private set; } = new string[]
+		{
+			@"Src\Client\**\Assets",
+		};
+
+		public string[] InitalizePaths { get; private set; } = new string[]
+		{
+			@"Data\Table",
+			@"Data\Table\schema",
+			@"Src\Client\**\Assets\StreamingAssets\Data\Table",
+			@"Bin\Data\Table"
+		};
+
 		public string SchemaPath { get; set; } = @"Data\Table\schema";
 		public string TablePath { get; set; } = @"Data\Table";
 		public string CommonPackageProjPath { get; set; } = @"Common\CommonPackage\CommonPackage.csproj";
 		public string SourcePath { get; set; } = @"Common\CommonPackage\src\table\GenerateTables.cs";
-		public string ClientSrcTablePath { get; set; } = @"Src\Client\CookieGame\Assets\StreamingAssets\Data\Table";
+		public string ClientSrcTablePath { get; set; } = @"Src\Client\**\Assets\StreamingAssets\Data\Table";
 		public string ClientBinTablePath { get; set; } = @"Bin\Client\**\StreamingAssets\Data\Table";
 
-		public string ClientSrcConfigPath { get; set; } = @"Src\Client\CookieGame\Assets\StreamingAssets\Data\Config";
+		public string ClientSrcConfigPath { get; set; } = @"Src\Client\**\Assets\StreamingAssets\Data\Config";
 		public string ClientBinConfigPath { get; set; } = @"Bin\Client\**\StreamingAssets\Data\Config";
 
 		public string ServerPath { get; set; } = @"Bin\Data\Table";
