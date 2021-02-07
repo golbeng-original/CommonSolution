@@ -73,7 +73,7 @@
 								<TabItem Header="스키마">
 									<TabItem.ContextMenu>
 										<ContextMenu>
-											<MenuItem Header="새로 불러오기" Click="MenuItem_Click" />
+											<MenuItem Header="새로 불러오기" Click="MenuItem_Click" Tag="SCHEMA_TAB"/>
 										</ContextMenu>
 									</TabItem.ContextMenu>
 									<Grid Background="#FFE5E5E5">
@@ -101,7 +101,7 @@
 								<TabItem Header="데이터">
 									<TabItem.ContextMenu>
 										<ContextMenu>
-											<MenuItem Header="새로 불러오기"/>
+											<MenuItem Header="새로 불러오기" Click="MenuItem_Click" Tag="TABLE_TAB"/>
 										</ContextMenu>
 									</TabItem.ContextMenu>
 									<Grid Background="#FFE5E5E5">

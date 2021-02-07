@@ -283,8 +283,21 @@ namespace GolbengFramework.GenerateTool
 
 		private void MenuItem_Click(object sender, RoutedEventArgs e)
 		{
-			InitializeSchmeList();
-			InitializeDataList();
+			MenuItem menuItem = sender as MenuItem;
+			if (menuItem == null)
+				return;
+
+			ClearLog();
+
+			if(menuItem.Tag?.Equals("SCHEMA_TAB") == true)
+			{
+				InitializeSchmeList();
+				InitializeDataList();
+			}
+			else if(menuItem.Tag?.Equals("TABLE_TAB") == true)
+			{
+				InitializeDataList();
+			}
 
 			AddLog("갱신 완료");
 		}
