@@ -70,45 +70,58 @@ namespace CommonPackage.String
 			if (fileInfo.Exists == false)
 				throw new FileNotFoundException($"{filePath} not found");
 
-			StringDataSerializeResult result = new StringDataSerializeResult();
-
-			var container = result.Container;
-			container.FileName = fileInfo.Name;
-
-			using (StreamReader sr = new StreamReader(filePath))
+			using (StreamReader streamReader = new StreamReader(filePath))
 			{
-				var content = sr.ReadToEnd();
+				StringDataSerializeResult result =  DeserializeContent(streamReader);
+				result.Container.FileName = fileInfo.Name;
 
-				try
-				{
-					var stringDataList = JsonConvert.DeserializeObject<List<StringData>>(content);
-
-					foreach(var stringData in stringDataList)
-					{
-						bool exists = container.StringDataSet.Add(stringData) ? false : true;
-						if (exists == false)
-							continue;
-
-						var alreadyStringData = container.StringDataSet.Where(s => s.Equals(stringData)).FirstOrDefault();
-						if (alreadyStringData == null)
-							continue;
-
-						if(result.DuplicateList.ContainsKey(alreadyStringData) == false)
-							result.DuplicateList.Add(alreadyStringData, new List<StringData>() { alreadyStringData });
-
-						result.DuplicateList[alreadyStringData].Add(stringData);
-					}
-
-				}
-				catch(Exception e)
-				{
-					throw new AggregateException($"{filePath} Deserialize Error", e);
-				}
+				return result;
 			}
-
-			return result;
 		}
-	
+
+		public static StringDataSerializeResult Deserialize(Stream stream)
+		{
+			using(StreamReader streamReader = new StreamReader(stream))
+			{
+				return DeserializeContent(streamReader);
+			}
+		}
+
+		private static StringDataSerializeResult DeserializeContent(StreamReader streamReader)
+		{
+			StringDataSerializeResult result = new StringDataSerializeResult();
+			var container = result.Container;
+
+			try
+			{
+				string content = streamReader.ReadToEnd();
+
+				var stringDataList = JsonConvert.DeserializeObject<List<StringData>>(content);
+
+				foreach (var stringData in stringDataList)
+				{
+					bool exists = container.StringDataSet.Add(stringData) ? false : true;
+					if (exists == false)
+						continue;
+
+					var alreadyStringData = container.StringDataSet.Where(s => s.Equals(stringData)).FirstOrDefault();
+					if (alreadyStringData == null)
+						continue;
+
+					if (result.DuplicateList.ContainsKey(alreadyStringData) == false)
+						result.DuplicateList.Add(alreadyStringData, new List<StringData>() { alreadyStringData });
+
+					result.DuplicateList[alreadyStringData].Add(stringData);
+				}
+
+				return result;
+			}
+			catch (Exception e)
+			{
+				throw e;
+			}
+		}
+
 		public static FileInfo Serialize(string rootDirectory, StringDataContainer conatiner)
 		{
 			string fullPath = Path.Combine(rootDirectory, conatiner.FileName);
