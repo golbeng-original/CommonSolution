@@ -33,13 +33,12 @@
 				<TabItem Header="테이블" Tag="TABLE">
 					<Grid Background="#FFE5E5E5">
 						<Grid.RowDefinitions>
-							<RowDefinition Height="112"/>
+							<RowDefinition Height="84"/>
 							<RowDefinition Height="30"/>
 							<RowDefinition Height="*"/>
 						</Grid.RowDefinitions>
 						<Grid Grid.Row="0" Background="#FFE5E5E5">
 							<Grid.RowDefinitions>
-								<RowDefinition Height="28"/>
 								<RowDefinition Height="28"/>
 								<RowDefinition Height="28"/>
 								<RowDefinition Height="28"/>
@@ -53,9 +52,6 @@
 								<TextBox Text="{Binding Path=ClientSrcDbPath, Mode=OneWay}" Margin="100,0,10,0" TextWrapping="Wrap" IsEnabled="False" VerticalAlignment="Center" />
 							</Grid>
 							<Grid Grid.Row="2">
-								<TextBox Text="{Binding Path=ClientBinDbPath, Mode=OneWay}" Margin="100,0,10,0" TextWrapping="Wrap" IsEnabled="False" VerticalAlignment="Center" />
-							</Grid>
-							<Grid Grid.Row="3">
 								<Label Content="Server 추출경로" HorizontalAlignment="Left" Width="100" VerticalAlignment="Center" Margin="0,2" FontWeight="Bold" HorizontalContentAlignment="Right"/>
 								<TextBox Text="{Binding Path=ServerDbPath, Mode=OneWay}" Margin="100,0,10,0" TextWrapping="Wrap" IsEnabled="False" VerticalAlignment="Center" />
 							</Grid>

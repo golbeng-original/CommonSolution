@@ -57,8 +57,6 @@ namespace GolbengFramework.GenerateTool
 
 		public string ClientSrcDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientSrcTablePath) : ""; }
 
-		public string ClientBinDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientBinTablePath) : ""; }
-
 		public string ClientSrcConfigPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientSrcConfigPath) : ""; }
 
 		public string ClientBinConfigPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientBinConfigPath) : ""; }
@@ -188,7 +186,6 @@ namespace GolbengFramework.GenerateTool
 			OnPropertyChanged("DllPath");
 			OnPropertyChanged("EnumPath");
 			OnPropertyChanged("ClientSrcDbPath");
-			OnPropertyChanged("ClientBinDbPath");
 			OnPropertyChanged("ServerDbPath");
 			OnPropertyChanged("CommonPackageProjPath");
 			OnPropertyChanged("ConfigurePath");

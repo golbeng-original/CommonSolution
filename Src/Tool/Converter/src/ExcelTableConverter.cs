@@ -30,14 +30,14 @@ namespace GolbengFramework.Converter
 			_enumDefines = enumDefine;
 		}
 
-		public void Convter()
+		public void Convter(bool useClient = false)
 		{
 			if (_excelDataTables.Count == 0)
 				throw new ArgumentNullException($"{nameof(ExcelDataTable)} is null");
 
 			SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_winsqlite3());
 
-			string dbDname = _excelDataTables[0].SchemaData.DbName;
+			string dbDname = useClient ? _excelDataTables[0].SchemaData.ClientUseDbName : _excelDataTables[0].SchemaData.DbName;
 
 			string dbPath = $@"{_extractRootPath}\{dbDname}";
 			using (var conn = new SqliteConnection($"Data Source={dbPath}"))

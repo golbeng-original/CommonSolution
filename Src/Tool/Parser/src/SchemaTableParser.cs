@@ -102,6 +102,8 @@ namespace GolbengFramework.Parser
 
 		public string DbName { get => $"{SchemaName.First().ToString().ToUpper()}{SchemaName.Substring(1)}.db"; }
 
+		public string ClientUseDbName { get => $"{SchemaName.First().ToString().ToUpper()}{SchemaName.Substring(1)}.bytes"; }
+
 		public ExcelSchemaField FindExcelSchemaField(string fieldName)
 		{
 			return SchemaFields.Where(s => s.Name.Equals(fieldName)).SingleOrDefault();
