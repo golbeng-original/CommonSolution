@@ -156,7 +156,8 @@ namespace GolbengFramework.Generator
 			builder.AppendLine("\tpublic static TableMeta TableMeta { get; set; } = new TableMeta()");
 			builder.AppendLine("\t{");
 			builder.AppendLine($"\t\tTableName = \"{excelSchemaData.TableName}\",");
-			builder.AppendLine($"\t\tDbName = \"{excelSchemaData.DbName}\"");
+			builder.AppendLine($"\t\tDbName = \"{excelSchemaData.DbName}\",");
+			builder.AppendLine($"\t\tClientDbName = \"{excelSchemaData.ClientUseDbName}\"");
 			builder.AppendLine("\t};");
 
 			builder.AppendLine("}");

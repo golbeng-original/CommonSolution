@@ -9,6 +9,7 @@ namespace CommonPackage.Tables
 	{
 		public string TableName { get; set; } = "";
 		public string DbName { get; set; } = "";
+		public string ClientDbName { get; set; } = "";
 	}
 
 	public class TblBase
@@ -45,7 +46,8 @@ namespace CommonPackage.Tables
 		public static TableMeta TableMeta { get; set; } = new TableMeta()
 		{
 			TableName = "TblTable1",
-			DbName = "Table1.db"
+			DbName = "Table1.db",
+			ClientDbName = "Table1.bytes"
 		};
 	}
 
@@ -60,7 +62,8 @@ namespace CommonPackage.Tables
 		public static TableMeta TableMeta { get; set; } = new TableMeta()
 		{
 			TableName = "TblExample_table",
-			DbName = "Example_table.db"
+			DbName = "Example_table.db",
+			ClientDbName = "Example_table.bytes"
 		};
 	}
 
