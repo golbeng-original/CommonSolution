@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CommonPackage.String
 {
@@ -72,7 +73,7 @@ namespace CommonPackage.String
 
 			using (StreamReader streamReader = new StreamReader(filePath))
 			{
-				StringDataSerializeResult result =  DeserializeContent(streamReader);
+				StringDataSerializeResult result = DeserializeContent(streamReader);
 				result.Container.FileName = fileInfo.Name;
 
 				return result;
@@ -81,7 +82,7 @@ namespace CommonPackage.String
 
 		public static StringDataSerializeResult Deserialize(Stream stream)
 		{
-			using(StreamReader streamReader = new StreamReader(stream))
+			using (StreamReader streamReader = new StreamReader(stream))
 			{
 				return DeserializeContent(streamReader);
 			}
@@ -96,10 +97,13 @@ namespace CommonPackage.String
 			{
 				string content = streamReader.ReadToEnd();
 
-				var stringDataList = JsonConvert.DeserializeObject<List<StringData>>(content);
-
-				foreach (var stringData in stringDataList)
+				var root = JArray.Parse(content);
+				foreach (JObject element in root)
 				{
+					var stringData = DeserializeStringData(element);
+					if (stringData == null)
+						continue;
+
 					bool exists = container.StringDataSet.Add(stringData) ? false : true;
 					if (exists == false)
 						continue;
@@ -112,6 +116,7 @@ namespace CommonPackage.String
 						result.DuplicateList.Add(alreadyStringData, new List<StringData>() { alreadyStringData });
 
 					result.DuplicateList[alreadyStringData].Add(stringData);
+
 				}
 
 				return result;
@@ -120,6 +125,37 @@ namespace CommonPackage.String
 			{
 				throw e;
 			}
+		}
+
+		private static StringData DeserializeStringData(JObject jObject)
+		{
+			StringData stringData = new StringData();
+
+			foreach (var property in jObject)
+			{
+				if (property.Key.Equals("Key", StringComparison.OrdinalIgnoreCase) == true)
+				{
+					stringData.Key = property.Value.ToString();
+				}
+				else if (property.Key.Equals("Group", StringComparison.OrdinalIgnoreCase) == true)
+				{
+					stringData.Group = property.Value.ToString();
+				}
+				else if (property.Key.Equals("Data", StringComparison.OrdinalIgnoreCase) == true)
+				{
+					stringData.Data = property.Value.ToString();
+				}
+				else if (property.Key.Equals("Options", StringComparison.OrdinalIgnoreCase) == true &&
+					property.Value.Type == JTokenType.Object)
+				{
+					foreach (JProperty optionProperty in property.Value)
+					{
+						stringData.Options.Add(optionProperty.Name, optionProperty.Value.ToString());
+					}
+				}
+			}
+
+			return stringData;
 		}
 
 		public static FileInfo Serialize(string rootDirectory, StringDataContainer conatiner)
@@ -132,7 +168,7 @@ namespace CommonPackage.String
 
 			var serializeContent = JsonConvert.SerializeObject(conatiner.StringDataSet.ToList(), Formatting.Indented);
 
-			using(StreamWriter sw = new StreamWriter(fullPath, false, Encoding.UTF8))
+			using (StreamWriter sw = new StreamWriter(fullPath, false, Encoding.UTF8))
 			{
 				sw.Write(serializeContent);
 				sw.Flush();

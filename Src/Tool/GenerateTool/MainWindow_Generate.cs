@@ -32,12 +32,19 @@ namespace GolbengFramework.GenerateTool
 				return;
 			}
 
+			if(File.Exists(MetaSourcePath) == false)
+			{
+				MessageBox.Show($"{MetaSourcePath} 소스파일이 없습니다.");
+				return;
+			}
+
 			ProgressDialog dialog = new ProgressDialog();
 			dialog.DoWorkHandler += (workerSender, e) =>
 			{
 				BackgroundWorker worker = workerSender as BackgroundWorker;
 
 				List<string> generateResults = new List<string>();
+				List<string> generateMetaResults = new List<string>();
 				foreach (var schemaNameInfo in _schemaNameList)
 				{
 					FileInfo fileInfo = new FileInfo(schemaNameInfo.SchemaFilePath);
@@ -51,7 +58,8 @@ namespace GolbengFramework.GenerateTool
 
 						TableSourceGenerator generator = new TableSourceGenerator(fileInfo.FullName);
 						var result = generator.Generate(_enumDefines.Value);
-						generateResults.Add(result);
+						generateResults.Add(result.tableSource);
+						generateMetaResults.Add(result.metaSource);
 					}
 					catch(Exception ex)
 					{
@@ -59,6 +67,7 @@ namespace GolbengFramework.GenerateTool
 					}
 				}
 
+				// TableSource Write
 				StringBuilder sourceBuiler = new StringBuilder();
 				sourceBuiler.AppendLine("using CommonPackage.Enums;");
 				sourceBuiler.AppendLine("namespace CommonPackage.Tables");
@@ -69,16 +78,46 @@ namespace GolbengFramework.GenerateTool
 				}
 				sourceBuiler.AppendLine("}");
 
-				worker.ReportProgress(100, $"SourceGenerate Complete");
+				worker.ReportProgress(60, $"Table Source Make Complete");
 
 				using (StreamWriter stream = new StreamWriter(SourcePath))
 				{
 					stream.Write(sourceBuiler.ToString());
 				}
 
+				// TableMetaSource Write
+				StringBuilder metaSourceBuilder = new StringBuilder();
+				metaSourceBuilder.AppendLine("using CommonPackage.Enums;");
+				metaSourceBuilder.AppendLine("namespace CommonPackage.Tables");
+				metaSourceBuilder.AppendLine("{");
+
+				metaSourceBuilder.AppendLine("public partial class GenerateTableMeta");
+				metaSourceBuilder.AppendLine("{");
+				metaSourceBuilder.AppendLine("private static void InitalizeGenerateTableMeta()");
+				metaSourceBuilder.AppendLine("{");
+
+				foreach (var generateMetaResult in generateMetaResults)
+				{
+					metaSourceBuilder.AppendLine(generateMetaResult);
+				}
+
+				metaSourceBuilder.AppendLine("}");
+				metaSourceBuilder.AppendLine("}");
+				metaSourceBuilder.AppendLine("}");
+
+				worker.ReportProgress(100, $"Table Meta Source Make Complete");
+
+				using (StreamWriter stream = new StreamWriter(MetaSourcePath))
+				{
+					stream.Write(metaSourceBuilder.ToString());
+				}
+
+
 				_sourceGenerateTextBox.Dispatcher.Invoke(() =>
 				{
 					_sourceGenerateTextBox.Text = sourceBuiler.ToString();
+					_sourceGenerateTextBox.Text += "\n\n";
+					_sourceGenerateTextBox.Text += metaSourceBuilder.ToString();
 				});
 			};
 

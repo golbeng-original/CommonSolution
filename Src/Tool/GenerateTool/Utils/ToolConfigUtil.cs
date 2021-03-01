@@ -33,9 +33,8 @@ namespace GolbengFramework.GenerateTool.Utils
 		public string TablePath { get; set; } = @"Data\Table";
 		public string CommonPackageProjPath { get; set; } = @"Common\CommonPackage\CommonPackage.csproj";
 		public string SourcePath { get; set; } = @"Common\CommonPackage\src\table\GenerateTables.cs";
-
+		public string MetaSourcePath { get; set; } = @"Common\CommonPackage\src\table\GenerateTablesMeta.cs";
 		public string ClientSrcTablePath { get; set; } = @"Src\Client\**\Assets\StreamingAssets\Data\Table";
-
 		public string ClientSrcConfigPath { get; set; } = @"Src\Client\**\Assets\StreamingAssets\Data\Config";
 		public string ClientBinConfigPath { get; set; } = @"Bin\Client\**\StreamingAssets\Data\Config";
 
@@ -67,6 +66,7 @@ namespace GolbengFramework.GenerateTool.Utils
 					this.TablePath = deserialize.TablePath;
 					this.CommonPackageProjPath = deserialize.CommonPackageProjPath;
 					this.SourcePath = deserialize.SourcePath;
+					this.MetaSourcePath = deserialize.MetaSourcePath;
 					this.ClientSrcTablePath = deserialize.ClientSrcTablePath;
 
 					this.ClientSrcConfigPath = deserialize.ClientSrcConfigPath;

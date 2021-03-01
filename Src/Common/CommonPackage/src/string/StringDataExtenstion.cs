@@ -10,8 +10,36 @@ namespace CommonPackage.String
 		public string FilterData { get; set; }
 	}
 
-
 	public static class StringDataExtenstion
+	{
+		public static bool IsDeepEquals(this StringData stringData, StringData rhs)
+		{
+			if (stringData.Key.Equals(rhs.Key) == false)
+				return false;
+
+			if (stringData.Data.Equals(rhs.Data) == false)
+				return false;
+
+			if (stringData.Group.Equals(rhs.Group) == false)
+				return false;
+
+			if (stringData.Options.Keys.Count != rhs.Options.Keys.Count)
+				return false;
+
+			foreach (var key in stringData.Options.Keys)
+			{
+				if (rhs.Options.ContainsKey(key) == false)
+					return false;
+
+				if (stringData.Options[key].Equals(rhs.Options[key]) == false)
+					return false;
+			}
+
+			return true;
+		}
+	}
+
+	public static class StringDataContainerExtenstion
 	{
 		public static IEnumerable<StringData> FilterStringDatas(this StringDataContainer conatiner, StringDataFilterOption option)
 		{
@@ -32,7 +60,7 @@ namespace CommonPackage.String
 
 		public static bool AddStringData(this StringDataContainer conatiner, StringData stringData)
 		{
-			if( conatiner.StringDataSet.Contains(stringData) == true)
+			if (conatiner.StringDataSet.Contains(stringData) == true)
 				return false;
 
 			conatiner.StringDataSet.Add(stringData);
@@ -42,32 +70,6 @@ namespace CommonPackage.String
 		public static void RemoveStringData(this StringDataContainer container, StringData stringData)
 		{
 			container.StringDataSet.Remove(stringData);
-		}
-
-		public static bool IsDeepEquals(this StringData stringData, StringData rhs)
-		{
-			if (stringData.Key.Equals(rhs.Key) == false)
-				return false;
-
-			if (stringData.Data.Equals(rhs.Data) == false)
-				return false;
-
-			if (stringData.Group.Equals(rhs.Group) == false)
-				return false;
-
-			if (stringData.Options.Keys.Count != rhs.Options.Keys.Count)
-				return false;
-
-			foreach(var key in stringData.Options.Keys)
-			{
-				if (rhs.Options.ContainsKey(key) == false)
-					return false;
-
-				if (stringData.Options[key].Equals(rhs.Options[key]) == false)
-					return false;
-			}
-
-			return true;
 		}
 	}
 }

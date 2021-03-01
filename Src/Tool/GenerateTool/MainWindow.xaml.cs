@@ -51,6 +51,8 @@ namespace GolbengFramework.GenerateTool
 
 		public string SourcePath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.SourcePath) : ""; }
 
+		public string MetaSourcePath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.MetaSourcePath) : ""; }
+
 		public string DllPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.CommonDllPath) : ""; }
 
 		public string EnumPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.EnumPath) : ""; }
@@ -183,6 +185,7 @@ namespace GolbengFramework.GenerateTool
 			OnPropertyChanged("MSBuildPath");
 			OnPropertyChanged("TablePath");
 			OnPropertyChanged("SourcePath");
+			OnPropertyChanged("MetaSourcePath");
 			OnPropertyChanged("DllPath");
 			OnPropertyChanged("EnumPath");
 			OnPropertyChanged("ClientSrcDbPath");

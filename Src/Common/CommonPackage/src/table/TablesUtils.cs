@@ -16,13 +16,11 @@ namespace CommonPackage.Tables
 		{
 			Type type = typeof(T);
 
-			var property = type.GetProperty("TableMeta", BindingFlags.Public | BindingFlags.Static);
-			if (property == null)
+			if (GenerateTablesMeta.TableMetaMapping.ContainsKey(type) == false)
 				return null;
 
-			var methodInfo = property.GetGetMethod();
-
-			return methodInfo?.Invoke(null, null) as TableMeta;
+			TableMeta metaData = GenerateTablesMeta.TableMetaMapping[type];
+			return metaData;
 		}
 	}
 }

@@ -22,7 +22,7 @@ namespace GolbengFramework.Generator
 			_schemaFilePath = schemaFilePath;
 		}
 
-		public string Generate(EnumsDefines enumDefines)
+		public (string tableSource, string metaSource) Generate(EnumsDefines enumDefines)
 		{
 			using (SchemaTableParser schemaParser = new SchemaTableParser(_schemaFilePath))
 			{
@@ -37,7 +37,7 @@ namespace GolbengFramework.Generator
 				GenerateTableSource(excelSchemaData);
 			}
 
-			return GenerateResult;
+			return (GenerateResult, GenerateMetaResult);
 		}
 
 		private bool Validation(ExcelSchemaField field, EnumsDefines enumDefines)
@@ -152,19 +152,25 @@ namespace GolbengFramework.Generator
 				builder.AppendLine($"\tpublic {prefix}{type} {field.Name} {accesorString} {defaultContext}");
 			}
 
+			builder.AppendLine("}");
+
+			GenerateResult = builder.ToString();
+
 			// MetaTable
-			builder.AppendLine("\tpublic static TableMeta TableMeta { get; set; } = new TableMeta()");
+			builder = new StringBuilder();
+
+			builder.AppendLine($"\tTableMetaMapping.Add(typeof({excelSchemaData.TableName}), new TableMeta()");
 			builder.AppendLine("\t{");
 			builder.AppendLine($"\t\tTableName = \"{excelSchemaData.TableName}\",");
 			builder.AppendLine($"\t\tDbName = \"{excelSchemaData.DbName}\",");
 			builder.AppendLine($"\t\tClientDbName = \"{excelSchemaData.ClientUseDbName}\"");
-			builder.AppendLine("\t};");
+			builder.AppendLine("\t});");
 
-			builder.AppendLine("}");
-
-			GenerateResult = builder.ToString();
+			GenerateMetaResult = builder.ToString();
 		}
 
 		public string GenerateResult { get; private set; } = "";
+
+		public string GenerateMetaResult { get; private set; } = "";
 	}
 }

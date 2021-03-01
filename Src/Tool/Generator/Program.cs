@@ -37,12 +37,13 @@ namespace Generator
 			GenerateTables(
 				@"D:\_Projects_Ing\CookieProject\table\schema",
 				@"D:\_Projects_Ing\CookieProject\src\Common\CommonPackage\src\table\GenerateTables.cs",
+				@"D:\_Projects_Ing\CookieProject\src\Common\CommonPackage\src\table\GenerateTableMeta.cs",
 				enumsDefines
 			);
 
 
 		}
-		static void GenerateTables(string rootDirectory, string targetSourceFile, EnumsDefines enumDefines)
+		static void GenerateTables(string rootDirectory, string targetSourceFile, string targetMetasourceFile, EnumsDefines enumDefines)
 		{
 			if (Directory.Exists(rootDirectory) == false)
 			{
@@ -57,6 +58,7 @@ namespace Generator
 			}
 
 			List<string> generateResults = new List<string>();
+			List<string> gnerateMetaResults = new List<string>();
 
 			var files = Directory.GetFiles(rootDirectory, "*.schema.xlsx");
 			foreach(var file in files)
@@ -69,7 +71,8 @@ namespace Generator
 				{
 					TableSourceGenerator generator = new TableSourceGenerator(fileInfo.FullName);
 					var result = generator.Generate(enumDefines);
-					generateResults.Add(result);
+					generateResults.Add(result.tableSource);
+					gnerateMetaResults.Add(result.metaSource);
 				}
 				catch (Exception e)
 				{
@@ -91,6 +94,30 @@ namespace Generator
 			using (StreamWriter stream = new StreamWriter(targetSourceFile))
 			{
 				stream.Write(sourceBuiler.ToString());
+			}
+
+			StringBuilder metaSourceBuilder = new StringBuilder();
+			metaSourceBuilder.AppendLine("using CommonPackage.Enums;");
+			metaSourceBuilder.AppendLine("namespace CommonPackage.Tables");
+			metaSourceBuilder.AppendLine("{");
+
+			metaSourceBuilder.AppendLine("public partial class GenerateTableMeta");
+			metaSourceBuilder.AppendLine("{");
+			metaSourceBuilder.AppendLine("private static void InitalizeGenerateTableMeta()");
+			metaSourceBuilder.AppendLine("{");
+
+			foreach (var generateMetaResult in gnerateMetaResults)
+			{
+				metaSourceBuilder.AppendLine(generateMetaResult);
+			}
+
+			metaSourceBuilder.AppendLine("}");
+			metaSourceBuilder.AppendLine("}");
+			metaSourceBuilder.AppendLine("}");
+
+			using (StreamWriter stream = new StreamWriter(targetMetasourceFile))
+			{
+				stream.Write(metaSourceBuilder.ToString());
 			}
 		}
 	
