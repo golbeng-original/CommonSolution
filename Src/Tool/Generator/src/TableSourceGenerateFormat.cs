@@ -9,6 +9,20 @@ namespace GolbengFramework.Generator
 {
 	internal class TableSourceGenerateFormat
 	{
+		struct GenerateFieldInfo
+		{
+			public string typeStr;
+			public string defaultContext;
+			public bool isPrimaryKey;
+			public bool isSecondaryKey;
+
+			public bool IsPkFiled()
+			{
+				return isPrimaryKey == true || isSecondaryKey == true ? true : false;
+			}
+		}
+
+
 		public static string GetMetaTableSource(ExcelSchemaData excelSchemaData)
 		{
 			StringBuilder builder = new StringBuilder();
@@ -25,29 +39,23 @@ namespace GolbengFramework.Generator
 
 		public static string GetTableSource(ExcelSchemaData excelSchemaData)
 		{
+			
+
 			StringBuilder builder = new StringBuilder();
 			builder.AppendLine($"public class {excelSchemaData.TableName} : TblBase");
 			builder.AppendLine("{");
 
-			string accesorString = "{ get; set; }";
-
 			foreach (var field in excelSchemaData.SchemaFields)
 			{
 				var fieldTypeInfo = GetFieldTypeInfo(field);
-
-				string type = fieldTypeInfo.typeStr;
-				string defaultContext = fieldTypeInfo.defaultContext;
-				string prefix = "";
-				if (field.Name.Equals("PrimaryKey", StringComparison.OrdinalIgnoreCase) == true ||
-					field.Name.Equals("SecondaryKey", StringComparison.OrdinalIgnoreCase) == true)
+				if (fieldTypeInfo.IsPkFiled())
 				{
-					prefix = "override ";
+					MakePkKeySource(builder, field.Name, fieldTypeInfo);
 				}
-
-				if (string.IsNullOrEmpty(defaultContext) == false)
-					defaultContext = $"= {defaultContext};";
-
-				builder.AppendLine($"\tpublic {prefix}{type} {field.Name} {accesorString} {defaultContext}");
+				else
+				{
+					MakeNonPkKeySource(builder, field.Name, fieldTypeInfo);
+				}
 			}
 
 			// PropertyMetaData
@@ -62,16 +70,53 @@ namespace GolbengFramework.Generator
 			return builder.ToString();
 		}
 
-		private static (string typeStr, string defaultContext) GetFieldTypeInfo(ExcelSchemaField field)
+		private static void MakePkKeySource(StringBuilder builder, string fieldName, GenerateFieldInfo generateFieldInfo)
+		{
+			string defaultContext = generateFieldInfo.defaultContext;
+			if (string.IsNullOrEmpty(defaultContext) == false)
+				defaultContext = $" = {defaultContext}";
+
+			string privateFieldName = $"_{fieldName}";
+			string isPrimryKeyString = generateFieldInfo.isPrimaryKey ? "true" : " false"; 
+
+			builder.AppendLine($"\tprivate {generateFieldInfo.typeStr} {privateFieldName}{defaultContext};");
+
+			builder.AppendLine($"\tpublic {generateFieldInfo.typeStr} {fieldName}");
+			builder.AppendLine($"\t{{");
+			builder.AppendLine($"\t\tget => {privateFieldName};");
+			builder.AppendLine($"\t\tset");
+			builder.AppendLine($"\t\t{{");
+			builder.AppendLine($"\t\t\t{privateFieldName} = value;");
+			builder.AppendLine($"\t\t\tConvertKey({privateFieldName}, {isPrimryKeyString});");
+			builder.AppendLine($"\t\t}}");
+			builder.AppendLine($"\t}}");
+		}
+
+		private static void MakeNonPkKeySource(StringBuilder builder, string fieldName, GenerateFieldInfo generateFieldInfo)
+		{
+			string accesorString = "{ get; set; }";
+
+			string defaultContext = generateFieldInfo.defaultContext;
+			if (string.IsNullOrEmpty(defaultContext) == false)
+				defaultContext = $"= {defaultContext};";
+
+			builder.AppendLine($"\tpublic {generateFieldInfo.typeStr} {fieldName} {accesorString} {defaultContext}");
+		}
+
+		private static GenerateFieldInfo GetFieldTypeInfo(ExcelSchemaField field)
 		{
 			string type = "";
 			string defaultContext = "";
+			bool isPrimaryKey = false;
+			bool isSecondaryKey = false;
 
-			if (field.Name.Equals("PrimaryKey", StringComparison.OrdinalIgnoreCase) == true ||
-				field.Name.Equals("SecondaryKey", StringComparison.OrdinalIgnoreCase) == true)
+			if (field.Name.Equals("PrimaryKey", StringComparison.OrdinalIgnoreCase) == true)
 			{
-				type = "uint";
-				defaultContext = string.IsNullOrEmpty(field.Default) ? "0" : $"{field.Default}";
+				isPrimaryKey = true;
+			}
+			if(field.Name.Equals("SecondaryKey", StringComparison.OrdinalIgnoreCase) == true)
+			{
+				isSecondaryKey = true;
 			}
 
 			if (type.Length == 0)
@@ -106,7 +151,13 @@ namespace GolbengFramework.Generator
 				}
 			}
 
-			return (type, defaultContext);
+			return new GenerateFieldInfo()
+			{
+				typeStr = type,
+				defaultContext = defaultContext,
+				isPrimaryKey = isPrimaryKey,
+				isSecondaryKey = isSecondaryKey
+			};
 		}
 
 		private static string MakeGetPropertyInfoSource(StringBuilder builder, ExcelSchemaData excelSchemaData)
@@ -132,8 +183,6 @@ namespace GolbengFramework.Generator
 		{
 			builder.AppendLine("\tpublic override bool SetPropertyValue(string propertyName, object value)");
 			builder.AppendLine("\t{");
-			builder.AppendLine("\t\tif (base.SetPropertyValue(propertyName, value) == true)");
-			builder.AppendLine("\t\t\treturn true;");
 
 			foreach (var field in excelSchemaData.SchemaFields)
 			{

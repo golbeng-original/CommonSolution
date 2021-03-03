@@ -42,19 +42,15 @@ namespace GolbengFramework.GenerateTool
 			foreach(var configFile in _configFileNameList)
 			{
 				string destClientSrcDirectory = ToolConfigUtil.FindWildCardPath(ClientSrcConfigPath);
-				string destClientBinDirectory = ToolConfigUtil.FindWildCardPath(ClientBinConfigPath);
 
 				string sourceConfigFilePath = System.IO.Path.Combine(ConfigurePath, configFile);
 				string destClientSrcPath = System.IO.Path.Combine(destClientSrcDirectory, configFile);
-				string destClientBinPath = System.IO.Path.Combine(destClientBinDirectory, configFile);
 
 				try
 				{
 					Directory.CreateDirectory(destClientSrcDirectory);
-					Directory.CreateDirectory(destClientBinDirectory);
 
 					File.Copy(sourceConfigFilePath, destClientSrcPath, true);
-					File.Copy(sourceConfigFilePath, destClientBinPath, true);
 				}
 				catch(Exception e)
 				{

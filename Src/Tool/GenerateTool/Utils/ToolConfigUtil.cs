@@ -25,7 +25,7 @@ namespace GolbengFramework.GenerateTool.Utils
 		{
 			@"Data\Table",
 			@"Data\Table\schema",
-			@"Src\Client\**\Assets\StreamingAssets\Data\Table",
+			@"Src\Client\**\Assets\_Data\Table",
 			@"Bin\Data\Table"
 		};
 
@@ -34,9 +34,8 @@ namespace GolbengFramework.GenerateTool.Utils
 		public string CommonPackageProjPath { get; set; } = @"Common\CommonPackage\CommonPackage.csproj";
 		public string SourcePath { get; set; } = @"Common\CommonPackage\src\table\GenerateTables.cs";
 		public string MetaSourcePath { get; set; } = @"Common\CommonPackage\src\table\GenerateTablesMeta.cs";
-		public string ClientSrcTablePath { get; set; } = @"Src\Client\**\Assets\StreamingAssets\Data\Table";
-		public string ClientSrcConfigPath { get; set; } = @"Src\Client\**\Assets\StreamingAssets\Data\Config";
-		public string ClientBinConfigPath { get; set; } = @"Bin\Client\**\StreamingAssets\Data\Config";
+		public string ClientSrcTablePath { get; set; } = @"Src\Client\**\Assets\_Data\Table";
+		public string ClientSrcConfigPath { get; set; } = @"Src\Client\**\Assets\_Data\Config";
 
 		public string ServerPath { get; set; } = @"Bin\Data\Table";
 		public string CommonDllPath { get; set; } = @"Bin\Lib\CommonPackage.dll";
@@ -70,7 +69,6 @@ namespace GolbengFramework.GenerateTool.Utils
 					this.ClientSrcTablePath = deserialize.ClientSrcTablePath;
 
 					this.ClientSrcConfigPath = deserialize.ClientSrcConfigPath;
-					this.ClientBinConfigPath = deserialize.ClientBinConfigPath;
 
 					this.ServerPath = deserialize.ServerPath;
 					this.CommonDllPath = deserialize.CommonDllPath;

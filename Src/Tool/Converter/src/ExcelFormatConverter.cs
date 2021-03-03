@@ -182,6 +182,7 @@ namespace GolbengFramework.Converter
 				}
 			}
 
+			enumList = enumList.Distinct().ToList();
 			return enumList;
 		}
 

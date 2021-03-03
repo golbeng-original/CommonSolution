@@ -12,18 +12,65 @@ namespace CommonPackage.Tables
 		public string ClientDbName { get; set; } = "";
 	}
 
-	public class TblBase
+	public partial class TblBase
 	{
-		public virtual uint primarykey { get; set; } = 0;
-		public virtual uint secondarykey { get; set; } = 0;
+		public static long ConvertKey(object key)
+		{
+			if (key is int)
+			{
+				return ConvertKey((int)key);
+			}
+			else if (key is uint)
+			{
+				return ConvertKey((uint)key);
+			}
+			else if (key is string)
+			{
+				return ConvertKey((string)key);
+			}
+			else if (key.GetType().IsEnum == true)
+			{
+				return ConvertKey(Convert.ToInt32(key));
+			}
 
-		public virtual int PropertyCount { get => 2; }
+			return 0;
+		}
+
+		public static long ConvertKey(int key)
+		{
+			return (long)key;
+		}
+
+		public static long ConvertKey(uint key)
+		{
+			return (long)key;
+		}
+
+		public static long ConvertKey(string key)
+		{
+			return (long)key.GetHashCode();
+		}
+
+		public static long ConvertKey<T>(T key) where T : Enum
+		{
+			return (long)Convert.ToInt32(key);
+		}
+	}
+
+	public partial class TblBase
+	{
+		private long _queryPrimarykey = 0;
+		private long _querySecondaryKey = 0;
+		public long queryPrimaryKey { get => _queryPrimarykey; }
+		public long querySecondaryKey { get => _querySecondaryKey; }
+
+		public virtual int PropertyCount { get => 0; }
 
 		public IEnumerable<string> Properties
 		{
 			get
 			{
-				for(int i = 0; i < PropertyCount; i++)
+				for (int i = 0; i < PropertyCount; i++)
 				{
 					var propertyInfo = GetPropertyInfo(i);
 					if (propertyInfo == null)
@@ -34,30 +81,23 @@ namespace CommonPackage.Tables
 			}
 		}
 
-
 		public override bool Equals(object obj)
 		{
 			return obj is TblBase @base &&
-				   primarykey == @base.primarykey &&
-				   secondarykey == @base.secondarykey;
+				   queryPrimaryKey == @base.queryPrimaryKey &&
+				   querySecondaryKey == @base.querySecondaryKey;
 		}
 
 		public override int GetHashCode()
 		{
 			int hashCode = -281792184;
-			hashCode = hashCode * -1521134295 + primarykey.GetHashCode();
-			hashCode = hashCode * -1521134295 + secondarykey.GetHashCode();
+			hashCode = hashCode * -1521134295 + queryPrimaryKey.GetHashCode();
+			hashCode = hashCode * -1521134295 + querySecondaryKey.GetHashCode();
 			return hashCode;
 		}
 
 		public virtual (string propertyName, Type type)? GetPropertyInfo(int index)
 		{
-			switch (index)
-			{
-				case 0: return (nameof(primarykey), primarykey.GetType());
-				case 1: return (nameof(secondarykey), secondarykey.GetType());
-			}
-
 			return null;
 		}
 
@@ -72,24 +112,6 @@ namespace CommonPackage.Tables
 
 		public virtual bool SetPropertyValue(string propertyName, object value)
 		{
-			if (propertyName.Equals("primaryKey", StringComparison.OrdinalIgnoreCase))
-			{
-				if (CheckProprtyType(primarykey, (uint)value) == false)
-					return false;
-
-				primarykey = (uint)value;
-				return true;
-			}
-
-			if (propertyName.Equals("secondarykey", StringComparison.OrdinalIgnoreCase))
-			{
-				if (CheckProprtyType(secondarykey, (uint)value) == false)
-					return false;
-
-				secondarykey = (uint)value;
-				return true;
-			}
-
 			return false;
 		}
 
@@ -97,14 +119,67 @@ namespace CommonPackage.Tables
 		{
 			return typeof(T) == value.GetType() ? true : false;
 		}
+
+		protected void ConvertKey(int key, bool primaryKey)
+		{
+			if (primaryKey == true)
+				_queryPrimarykey = TblBase.ConvertKey(key);
+			else
+				_querySecondaryKey = TblBase.ConvertKey(key);
+		}
+
+		protected void ConvertKey(uint key, bool primaryKey)
+		{
+			if (primaryKey == true)
+				_queryPrimarykey = TblBase.ConvertKey(key);
+			else
+				_querySecondaryKey = TblBase.ConvertKey(key);
+		}
+
+		protected void ConvertKey(string key, bool primaryKey)
+		{
+			key = key != null ? key : "";
+
+			if (primaryKey == true)
+				_queryPrimarykey = TblBase.ConvertKey(key);
+			else
+				_querySecondaryKey = TblBase.ConvertKey(key);
+		}
+
+		protected void ConvertKey<T>(T key, bool primaryKey) where T : Enum
+		{
+			if (primaryKey == true)
+				_queryPrimarykey = TblBase.ConvertKey(key);
+			else
+				_querySecondaryKey = TblBase.ConvertKey(key);
+		}
 	}
 
 
 	/// Example Table
 	public class TblTable1 : TblBase
 	{
-		public override uint primarykey { get; set; }
-		public override uint secondarykey { get; set; }
+		private uint _primarykey = 0;
+		private uint _secondarkey = 0;
+
+		public uint primarykey
+		{
+			get => _primarykey;
+			set
+			{
+				_primarykey = value;
+				ConvertKey(_primarykey, true);
+			}
+		}
+		public uint secondarykey
+		{
+			get => _secondarkey;
+			set
+			{
+				_secondarkey = value;
+				ConvertKey(_secondarkey, false);
+			}
+		}
 
 		public int Id { get; set; }
 		public string Name { get; set; }
@@ -153,8 +228,28 @@ namespace CommonPackage.Tables
 
 	public class TblTable2 : TblBase
 	{
-		public override uint primarykey { get; set; } = 0;
-		public override uint secondarykey { get; set; } = 0;
+		private TestEnum _primarykey = TestEnum.None;
+		public TestEnum primarykey
+		{
+			get => _primarykey;
+			set
+			{
+				_primarykey = value;
+				ConvertKey(_primarykey, true);
+			}
+		}
+
+		private string _secondaryKey = "";
+		public string secondarykey
+		{
+			get => _secondaryKey;
+			set
+			{
+				_secondaryKey = value;
+				ConvertKey(_secondaryKey, false);
+			}
+		}
+
 		public int IntField1 { get; set; } = 0;
 		public string StringField2 { get; set; } = "";
 		public float FloatField3 { get; set; } = 0;
@@ -179,8 +274,23 @@ namespace CommonPackage.Tables
 
 		public override bool SetPropertyValue(string propertyName, object value)
 		{
-			if (base.SetPropertyValue(propertyName, value) == true)
+			if (propertyName.Equals("primarykey", StringComparison.OrdinalIgnoreCase))
+			{
+				if (CheckProprtyType(primarykey, (TestEnum)value) == false)
+					return false;
+
+				primarykey = (TestEnum)value;
 				return true;
+			}
+
+			if (propertyName.Equals("secondarykey", StringComparison.OrdinalIgnoreCase))
+			{
+				if (CheckProprtyType(secondarykey, (string)value) == false)
+					return false;
+
+				secondarykey = (string)value;
+				return true;
+			}
 
 			if (propertyName.Equals("IntField1", StringComparison.OrdinalIgnoreCase))
 			{

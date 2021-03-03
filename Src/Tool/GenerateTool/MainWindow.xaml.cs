@@ -61,8 +61,6 @@ namespace GolbengFramework.GenerateTool
 
 		public string ClientSrcConfigPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientSrcConfigPath) : ""; }
 
-		public string ClientBinConfigPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ClientBinConfigPath) : ""; }
-
 		public string ServerDbPath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ServerPath) : ""; }
 
 		public string ConfigurePath { get => RootPath.Length > 0 ? System.IO.Path.Combine(RootPath, _toolPathConfigInfo.ConfigurePath) : ""; }
