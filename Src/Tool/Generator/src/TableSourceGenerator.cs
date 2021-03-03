@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace GolbengFramework.Generator
 {
+
 	public class TableSourceGenerator
 	{
 		private string _schemaFilePath = "";
@@ -95,78 +96,11 @@ namespace GolbengFramework.Generator
 
 		private void GenerateTableSource(ExcelSchemaData excelSchemaData)
 		{
-			StringBuilder builder = new StringBuilder();
-			builder.AppendLine($"public class {excelSchemaData.TableName} : TblBase");
-			builder.AppendLine("{");
+			// Table Body Source
+			GenerateResult = TableSourceGenerateFormat.GetTableSource(excelSchemaData);
 
-			string accesorString = "{ get; set; }";
-
-			foreach(var field in excelSchemaData.SchemaFields)
-			{
-				string type = "";
-				string defaultContext = "";
-				string prefix = "";
-				if(field.Name.Equals("PrimaryKey", StringComparison.OrdinalIgnoreCase) == true ||
-					field.Name.Equals("SecondaryKey", StringComparison.OrdinalIgnoreCase) == true)
-				{
-					prefix = "override ";
-					type = "uint";
-					defaultContext = string.IsNullOrEmpty(field.Default) ? "0" : $"{field.Default}";
-				}
-
-				if(type.Length == 0)
-				{
-					switch (field.Type.ToLower())
-					{
-						case "string":
-							type = "string";
-							defaultContext = $"\"{field.Default}\"";
-							break;
-						case "int":
-							type = "int";
-							defaultContext = string.IsNullOrEmpty(field.Default) ? "0" : $"{field.Default}";
-							break;
-						case "uint":
-							type = "uint";
-							defaultContext = string.IsNullOrEmpty(field.Default) ? "0" : $"{field.Default}";
-							break;
-						case "float":
-							type = "float";
-							defaultContext = string.IsNullOrEmpty(field.Default) ? "0" : $"{field.Default}";
-							break;
-						case "bool":
-							type = "bool";
-							defaultContext = string.IsNullOrEmpty(field.Default) ? "false" : $"{field.Default}";
-							defaultContext = defaultContext.ToLower();
-							break;
-						default:    // enum 종류
-							type = field.Type;
-							defaultContext = string.IsNullOrEmpty(field.Default) ? "" : $"{field.Type}.{field.Default}";
-							break;
-					}
-				}
-
-				if (string.IsNullOrEmpty(defaultContext) == false)
-					defaultContext = $"= {defaultContext};";
-
-				builder.AppendLine($"\tpublic {prefix}{type} {field.Name} {accesorString} {defaultContext}");
-			}
-
-			builder.AppendLine("}");
-
-			GenerateResult = builder.ToString();
-
-			// MetaTable
-			builder = new StringBuilder();
-
-			builder.AppendLine($"\tTableMetaMapping.Add(typeof({excelSchemaData.TableName}), new TableMeta()");
-			builder.AppendLine("\t{");
-			builder.AppendLine($"\t\tTableName = \"{excelSchemaData.TableName}\",");
-			builder.AppendLine($"\t\tDbName = \"{excelSchemaData.DbName}\",");
-			builder.AppendLine($"\t\tClientDbName = \"{excelSchemaData.ClientUseDbName}\"");
-			builder.AppendLine("\t});");
-
-			GenerateMetaResult = builder.ToString();
+			// Table Meta Source
+			GenerateMetaResult = TableSourceGenerateFormat.GetMetaTableSource(excelSchemaData);
 		}
 
 		public string GenerateResult { get; private set; } = "";

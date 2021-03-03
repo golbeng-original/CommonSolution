@@ -69,6 +69,8 @@ namespace GolbengFramework.GenerateTool
 
 				// TableSource Write
 				StringBuilder sourceBuiler = new StringBuilder();
+
+				sourceBuiler.AppendLine("using System;");
 				sourceBuiler.AppendLine("using CommonPackage.Enums;");
 				sourceBuiler.AppendLine("namespace CommonPackage.Tables");
 				sourceBuiler.AppendLine("{");
@@ -87,11 +89,12 @@ namespace GolbengFramework.GenerateTool
 
 				// TableMetaSource Write
 				StringBuilder metaSourceBuilder = new StringBuilder();
+				metaSourceBuilder.AppendLine("using System;");
 				metaSourceBuilder.AppendLine("using CommonPackage.Enums;");
 				metaSourceBuilder.AppendLine("namespace CommonPackage.Tables");
 				metaSourceBuilder.AppendLine("{");
 
-				metaSourceBuilder.AppendLine("public partial class GenerateTableMeta");
+				metaSourceBuilder.AppendLine("public partial class GenerateTablesMeta");
 				metaSourceBuilder.AppendLine("{");
 				metaSourceBuilder.AppendLine("private static void InitalizeGenerateTableMeta()");
 				metaSourceBuilder.AppendLine("{");
